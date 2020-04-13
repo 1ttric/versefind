@@ -19,6 +19,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -686,13 +687,14 @@ func main() {
 
 	flag.StringVar(&listenAddr, "listen", "0.0.0.0:3001", "the address and port on which to listen")
 	flag.StringVar(&oauthRedirectAddr, "oauthredirectaddr", "https://versefind.com/callback", "the oauth redirect endpoint")
-	flag.StringVar(&oauthClientID, "oauthclientid", "", "the Spotify oauth client ID")
-	flag.StringVar(&oauthSecret, "oauthsecret", "", "the Spotify oauth secret key")
 	flag.StringVar(&esAddr, "elastic", "http://127.0.0.1:9200", "the Elastic instance in which to cache track data and lyric content")
 	flag.Parse()
 
+	oauthClientID = os.Getenv("OAUTH_CLIENTID")
+	oauthSecret = os.Getenv("OAUTH_SECRET")
+
 	if oauthClientID == "" || oauthSecret == "" {
-		log.Fatalf("Spotify OAuth2 credentials are required")
+		log.Fatalf("Spotify OAuth2 credentials are required. Specify with OAUTH_CLIENTID and OAUTH_SECRET.")
 	}
 	if esAddr == "" {
 		log.Fatalf("Elasticsearch endpoint is required")
