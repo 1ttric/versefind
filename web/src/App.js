@@ -175,7 +175,6 @@ function LoginScreen() {
 }
 
 function SearchScreen({ws, audio}) {
-    console.log("Search screen rendering")
     const pageSize = 20;
 
     const [status, setStatus] = useState(null);
