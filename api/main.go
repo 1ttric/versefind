@@ -316,7 +316,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	token, err := spotifyAuth.Token(session, r)
 	if err != nil {
-		log.Error("could not generate oauth token; %s", err.Error())
+		log.Errorf("could not generate oauth token: %s", err.Error())
 		http.Error(w, "", 500)
 		return
 	}
