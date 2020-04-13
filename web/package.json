@@ -1,0 +1,46 @@
+{
+  "name": "versefind",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^4.9.8",
+    "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.47",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "@welldone-software/why-did-you-render": "^4.0.6",
+    "axios": "^0.19.2",
+    "fuse.js": "^5.0.10-beta",
+    "http-proxy-middleware": "^1.0.3",
+    "rc-texty": "^0.2.0",
+    "react": "^16.13.1",
+    "react-cookie": "^4.0.3",
+    "react-dom": "^16.13.1",
+    "react-highlight-words": "^0.16.0",
+    "react-reveal": "^1.2.2",
+    "react-scripts": "3.4.1",
+    "string-similarity": "^4.0.1"
+  },
+  "scripts": {
+    "start": "BROWSER=none react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

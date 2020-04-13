@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: versefind
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: versefind
+  template:
+    metadata:
+      name: versefind
+      labels:
+        app: versefind
+    spec:
+      containers:
+      - name: elastic
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
+        env:
+        - name: discovery.type
+          value: single-node
+        volumeMounts:
+        - name: appdata
+          mountPath: /usr/share/elasticsearch/data
+      - name: versefind-api
+        image: registry.int.vesey.tech/will/versefind/api
+      - name: versefind-web
+        image: registry.int.vesey.tech/will/versefind/web
+      volumes:
+      - name: appdata
+        hostPath:
+          path: /mnt/tank/data/containers/versefind
+      imagePullSecrets:
+      - name: gitlab-registry
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: versefind
+spec:
+  ports:
+  - name: tcp
+    port: 80
+  selector:
+    app: versefind
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: versefind
+spec:
+  entryPoints:
+    - https
+  routes:
+  - match: Host(`versefind.com`)
+    kind: Rule
+    services:
+    - name: versefind
+      port: 80
+  tls:
+    certResolver: default
+    domains:
+    - main: "versefind.com"
+
