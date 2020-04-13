@@ -259,7 +259,7 @@ function SearchScreen({ws, audio}) {
             <List style={{flex: "1 1 0", overflowY: "auto"}}>
                 {(searchResult?.results || []).map((track, idx) => <Track key={idx} trackData={track} audio={audio}/>)}
             </List>
-            {numPages ? <Box my={2} style={{alignSelf: "center"}}>
+            {numPages > 1 ? <Box my={2} style={{alignSelf: "center"}}>
                 <Pagination size="small"
                             count={numPages}
                             showFirstButton
@@ -309,7 +309,7 @@ function Track({trackData, audio}) {
                  onMouseEnter={playAudio}
                  onMouseLeave={pauseAudio}
                  mr={1}
-                 style={{flex: "0 0 auto", cursor:"pointer"}}>
+                 style={{flex: "0 0 auto", cursor: "pointer"}}>
                 <div style={{width: "10vh"}}>
                     <div style={{
                         paddingBottom: "100%",
@@ -343,7 +343,7 @@ function Track({trackData, audio}) {
 
             <ExpansionPanel elevation={0}
                             TransitionProps={{unmountOnExit: true}}
-            style={{flex:"1"}}>
+                            style={{flex: "1"}}>
                 <ExpansionPanelSummary expandIcon={
                     trackData.lyrics ? (<ExpandMoreIcon/>) : null
                 }
