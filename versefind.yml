@@ -24,6 +24,11 @@ spec:
           mountPath: /usr/share/elasticsearch/data
       - name: versefind-api
         image: registry.int.vesey.tech/will/versefind/api
+        env:
+        - name: OAUTH_CLIENTID
+          value: ""
+        - name: OAUTH_SECRET
+          value: ""
       - name: versefind-web
         image: registry.int.vesey.tech/will/versefind/web
       volumes:
