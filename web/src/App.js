@@ -66,6 +66,41 @@ const LYRICS = [
         title: "So Long, Marianne",
         text: "Well you know that I love to live with you\nbut you make me forget so very much\nI forget to pray for the angels\nAnd then the angels forget to pray for us"
     },
+    {
+        artist: "The Libertines",
+        title: "Can't Stand Me Now",
+        text: "An end fitting for the start\nYou twist and tore our love apart"
+    },
+    {
+        artist: "Kate Bush",
+        title: "Cloudbusting",
+        text: "You’re like my yo-yo/ That glowed in the dark\nWhat made it special\nMade it dangerous\nSo I bury it\nAnd forget"
+    },
+    {
+        artist: "Nick Cave",
+        title: "Into My Arms",
+        text: "I don’t believe in an interventionist God\nBut I know, darling, that you do\nBut if I did I would kneel down and ask Him\nNot to intervene when it came to you"
+    },
+    {
+        artist: "Sister Of Mercy",
+        title: "This Corrosion",
+        text: "On days like this\nIn times like these\nI feel an animal deep inside\nHeel to haunch on bended knees"
+    },
+    {
+        artist: "Sultans of Ping FC",
+        title: "Where's Me Jumper",
+        text: "It’s alright to say things can only get better\nYou haven’t lost your brand new sweater\nPure new wool, and perfect stitches\nNot the type of jumper that makes you itches"
+    },
+    {
+        artist: "The Smiths",
+        title: "There Is A Light That Never Goes Out",
+        text: "Take me out tonight\nTake me anywhere, I don’t care\nI don’t care, I don’t care"
+    },
+    {
+        artist: "Bruce Springsteen",
+        title: "I'm On Fire",
+        text: "At night I wake up with the sheets soaking wet\nAnd a freight train running through the\nMiddle of my head\nOnly you can cool my desire"
+    }
 ];
 
 function App() {
@@ -239,6 +274,7 @@ function SearchScreen({ws, audio}) {
                                }}
                                onKeyDown={(evt) => {
                                    clearTimeout(searchTimeout);
+                                   let query = evt.target.value;
                                    evt.keyCode === 13 && doSearch(query, page)
                                }}
                                InputProps={{
