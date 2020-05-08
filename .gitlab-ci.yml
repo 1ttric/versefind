@@ -16,7 +16,7 @@ build-api:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
     - cd api
-    - docker build --pull -t "${CI_REGISTRY_IMAGE}/api" .
+    - docker build --pull --network host -t "${CI_REGISTRY_IMAGE}/api" .
     - docker push "${CI_REGISTRY_IMAGE}/api"
 
 build-web:
@@ -28,5 +28,5 @@ build-web:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
     - cd web
-    - docker build --pull -t "${CI_REGISTRY_IMAGE}/web" .
+    - docker build --pull --network host -t "${CI_REGISTRY_IMAGE}/web" .
     - docker push "${CI_REGISTRY_IMAGE}/web"
