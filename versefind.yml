@@ -26,9 +26,15 @@ spec:
         image: registry.int.vesey.tech/will/versefind/api
         env:
         - name: OAUTH_CLIENTID
-          value: "***REMOVED***"
+          valueFrom:
+            secretKeyRef:
+              name: versefind
+              key: OAUTH_CLIENTID
         - name: OAUTH_SECRET
-          value: "***REMOVED***"
+          valueFrom:
+            secretKeyRef:
+              name: versefind
+              key: OAUTH_SECRET
       - name: versefind-web
         image: registry.int.vesey.tech/will/versefind/web
       volumes:
