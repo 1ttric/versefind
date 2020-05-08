@@ -182,7 +182,7 @@ function LoginScreen() {
                     flex: "5",
                     display: "flex",
                     flexDirection: "column",
-                    justifyContent: "end"
+                    justifyContent: "flex-end"
                 }}>
                     <Box>
                         <Typography variant="h5" component="h2">
