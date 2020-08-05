@@ -39,7 +39,8 @@ spec:
         image: registry.int.vesey.tech/will/versefind/web
       volumes:
       - name: appdata
-        hostPath:
+        nfs:
+          server: nas
           path: /mnt/tank/data/containers/versefind
       imagePullSecrets:
       - name: gitlab-registry
