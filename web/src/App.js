@@ -328,9 +328,7 @@ function Track({trackData, audio}) {
             if (audio.current.src !== previewLink) {
                 audio.current.src = previewLink; // If the audio source is empty because of a fresh render or unload, populate (or repopulate) its src attribute
             }
-            if (audio.current.src === "") {
-                return
-            }
+            if (!previewLink) return
             audio.current.play()
         } catch (err) {
             console.log("Error previewing track", err)
