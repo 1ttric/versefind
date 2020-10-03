@@ -1,7 +1,7 @@
 FROM node:lts-slim AS build
 WORKDIR /app/src
 COPY . .
-RUN yarn install --verbose && \
+RUN yarn install && \
     yarn build --verbose
 
 FROM nginx:1.16.1-alpine
