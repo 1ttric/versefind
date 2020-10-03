@@ -12,4 +12,5 @@ FROM scratch
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=build /app/build /app/build
 
+EXPOSE 3001
 ENTRYPOINT ["/app/build"]
