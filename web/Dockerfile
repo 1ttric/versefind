@@ -7,5 +7,5 @@ RUN yarn install --verbose && \
 FROM nginx:1.16.1-alpine
 COPY --from=build /app/src/build /usr/share/nginx/html
 COPY deploy/default.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
+EXPOSE 3000
 CMD ["nginx", "-g", "daemon off;"]
