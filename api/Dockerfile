@@ -5,8 +5,8 @@ RUN apk update && \
 
 WORKDIR /app/src
 COPY . .
-RUN go get -d -v
-RUN CGO_ENABLED=0 go build -v -o /app/build
+RUN go get -d -v ./...
+RUN CGO_ENABLED=0 go build -v -trimpath -o /app/build
 
 FROM scratch
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
