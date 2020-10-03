@@ -2,7 +2,6 @@ image: docker:git
 
 stages:
 - build
-- deploy
 
 variables:
   DOCKER_HOST: tcp://127.0.0.1:2375
@@ -10,6 +9,9 @@ variables:
 build-api:
   image: docker:latest
   stage: build
+  only:
+    changes:
+      - api/**/*
   services:
     - docker:18.09.7-dind
   before_script:
@@ -22,6 +24,9 @@ build-api:
 build-web:
   image: docker:latest
   stage: build
+  only:
+    changes:
+      - web/**/*
   services:
     - docker:18.09.7-dind
   before_script:
