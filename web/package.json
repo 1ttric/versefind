@@ -10,7 +10,7 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "@welldone-software/why-did-you-render": "^4.0.6",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "fuse.js": "^5.0.10-beta",
     "http-proxy-middleware": "^1.0.3",
     "rc-texty": "^0.2.0",
