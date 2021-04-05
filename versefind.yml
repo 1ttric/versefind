@@ -67,7 +67,7 @@ spec:
   entryPoints:
     - https
   routes:
-  - match: Host(`versefind.svc.vesey.tech`)
+  - match: Host(`versefind.vesey.tech`)
     kind: Rule
     services:
     - name: versefind
