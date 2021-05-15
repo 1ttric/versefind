@@ -75,5 +75,5 @@ spec:
   tls:
     certResolver: default
     domains:
-    - main: "versefind.com"
+    - main: "versefind.vesey.tech"
 
