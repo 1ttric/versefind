@@ -22,7 +22,7 @@ spec:
         volumeMounts:
         - name: appdata
           mountPath: /usr/share/elasticsearch/data
-      - name: versefind-api
+      - name: api
         image: registry.svc.vesey.tech/will/versefind/api
         env:
         - name: OAUTH_CLIENTID
@@ -35,7 +35,7 @@ spec:
             secretKeyRef:
               name: versefind
               key: OAUTH_SECRET
-      - name: versefind-web
+      - name: web
         image: registry.svc.vesey.tech/will/versefind/web
       volumes:
       - name: appdata
