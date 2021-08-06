@@ -18,7 +18,7 @@ import Pagination from "@material-ui/lab/Pagination";
 import axios from "axios";
 import {ThemeProvider} from "@material-ui/core/styles";
 import MusicNoteIcon from "@material-ui/icons/MusicNote";
-import {createTheme} from "@material-ui/core";
+import {createTheme, CssBaseline} from "@material-ui/core";
 import Slide from "@material-ui/core/Slide";
 import KeyboardBackspaceIcon from "@material-ui/icons/KeyboardBackspace";
 import Fade from "@material-ui/core/Fade";
@@ -119,6 +119,7 @@ const App: FC = () => {
 
     return (
         <ThemeProvider theme={createTheme({palette: {type: "dark"}})}>
+            <CssBaseline/>
             {
                 cookies.session ?
                     <SearchScreen ws={wsRef.current} audio={audio.current}/> :
