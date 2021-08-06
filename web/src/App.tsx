@@ -1,28 +1,29 @@
-import React, {useEffect, useRef, useState} from 'react';
-import './App.css';
+import {FC, useEffect, useRef, useState} from "react";
+import "./App.css";
 import Button from "@material-ui/core/Button";
 import Toolbar from "@material-ui/core/Toolbar";
-import SearchIcon from '@material-ui/icons/Search';
+import SearchIcon from "@material-ui/icons/Search";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import Box from "@material-ui/core/Box";
 import List from "@material-ui/core/List";
-import {useCookies} from 'react-cookie';
+import {useCookies} from "react-cookie";
 import Typography from "@material-ui/core/Typography";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import Pagination from '@material-ui/lab/Pagination';
-import axios from 'axios';
-import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
-import MusicNoteIcon from '@material-ui/icons/MusicNote';
-import {CssBaseline} from "@material-ui/core";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import Pagination from "@material-ui/lab/Pagination";
+import axios from "axios";
+import {ThemeProvider} from "@material-ui/core/styles";
+import MusicNoteIcon from "@material-ui/icons/MusicNote";
+import {createTheme} from "@material-ui/core";
 import Slide from "@material-ui/core/Slide";
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
+import KeyboardBackspaceIcon from "@material-ui/icons/KeyboardBackspace";
 import Fade from "@material-ui/core/Fade";
 import IconButton from "@material-ui/core/IconButton";
+import ReconnectingWebSocket from "reconnecting-websocket";
 
 
 const LYRICS = [
@@ -103,36 +104,31 @@ const LYRICS = [
     }
 ];
 
-function App() {
-    const ws = useRef(null);
+const App: FC = () => {
     const audio = useRef(new Audio(""));
     const [cookies, , removeCookie] = useCookies(["session"]);
+    const wsRef = useRef<ReconnectingWebSocket>();
 
     useEffect(() => {
-        if (ws.current) return;
-        ws.current = new WebSocket(window.location.origin.replace(/^http/, 'ws') + "/ws");
-        ws.current.onopen = () => console.log("Websocket connected");
-        ws.current.onerror = (evt) => {
-            console.log("Websocket error", evt);
-        };
-        ws.current.onclose = (evt) => {
-            // This custom websocket close code indicates our Spotify API token was not found or is otherwise invalid
-            // In this case we will redirect back to the homepage
-            if (evt.code === 4000) {
-                removeCookie("session");
-            }
-        };
-    });
-    const theme = createMuiTheme({palette: {type: 'dark'},});
+        let ws = new ReconnectingWebSocket("http://127.0.0.1:3001");
+        // This custom websocket close code indicates our Spotify API token was not found or is otherwise invalid
+        // In this case we will redirect back to the homepage
+        ws.onclose = evt => evt.code === 4000 && removeCookie("session")
+        wsRef.current = ws;
+    }, [removeCookie]);
+
     return (
-        <ThemeProvider theme={theme}>
-            <CssBaseline/>
-            {cookies.session ? <SearchScreen ws={ws} audio={audio}/> : <LoginScreen/>}
+        <ThemeProvider theme={createTheme({palette: {type: "dark"}})}>
+            {
+                cookies.session ?
+                    <SearchScreen ws={wsRef.current} audio={audio.current}/> :
+                    <LoginScreen/>
+            }
         </ThemeProvider>
     );
 }
 
-function LoginScreen() {
+const LoginScreen: FC = () => {
     const rotating = useRef(false);
     const rotatingContinuous = useRef(false);
     const lyricIndex = useRef(Math.floor(Math.random() * LYRICS.length));
@@ -153,19 +149,17 @@ function LoginScreen() {
         }, 2000);
     };
 
-    const continuousRotateText = () => {
+
+    useEffect(() => {
         if (rotatingContinuous.current) return;
         setInterval(rotateText, 7000);
         rotatingContinuous.current = true;
-    };
-
-    const countNewLines = (text) => (text.match(/\n/g) || []).length;
-
-    useEffect(continuousRotateText);
+    });
 
     let lyric = LYRICS[lyricIndex.current];
     let lyricTextPadded = lyric.text;
     // Pad lyrics vertically to greatest line count
+    const countNewLines = (text: string) => (text.match(/\n/g) || []).length;
     lyricTextPadded += "\n ".repeat(LYRICS.map(({text}) => countNewLines(text)).reduce((a, b) => Math.max(a, b)) - countNewLines(lyric.text) + 1);
 
     return (
@@ -209,22 +203,27 @@ function LoginScreen() {
 
 }
 
-function SearchScreen({ws, audio}) {
+interface SearchScreenProps {
+    ws?: ReconnectingWebSocket
+    audio?: HTMLAudioElement
+}
+
+const SearchScreen: FC<SearchScreenProps> = props => {
     const pageSize = 20;
 
-    const [status, setStatus] = useState(null);
+    const [status, setStatus] = useState<any>(null);
     const [query, setQuery] = useState("*");
     const [page, setPage] = useState(0);
-    const [searchTimeout, setSearchTimeout] = useState();
+    const [searchTimeout, setSearchTimeout] = useState<number>();
     const [searchCount, setSearchCount] = useState(0);
-    const [searchResult, setSearchResult] = useState([]);
+    const [searchResult, setSearchResult] = useState<any>([]);
     const [, , removeCookie] = useCookies(["session"]);
 
     // Wait until the websocket has been created and then set a listener
     useEffect(() => {
         let interval = setInterval(() => {
-            if (!ws.current || ws.current.onmessage) return;
-            ws.current.onmessage = (msg) => {
+            if (!props.ws?.onmessage) return;
+            props.ws.onmessage = msg => {
                 let status = JSON.parse(msg.data);
                 if (status.complete) {
                     // Now that we've received the last progress report, refresh the search screen
@@ -238,7 +237,7 @@ function SearchScreen({ws, audio}) {
         }, 100)
     });
 
-    const doSearch = async (thisQuery, page) => {
+    const doSearch = async (thisQuery: string, page: number) => {
         console.log(`Performing search with q=${thisQuery}, offset=${page * pageSize}, limit=${pageSize}`);
         setSearchResult([]);
         setQuery(thisQuery);
@@ -269,13 +268,13 @@ function SearchScreen({ws, audio}) {
                                onChange={async (evt) => {
                                    clearTimeout(searchTimeout);
                                    let query = evt.target.value;
-                                   let timeout = setTimeout(async () => await doSearch(query, page), 300);
-                                   setSearchTimeout(timeout);
+                                   let timeout = setTimeout(async () => await doSearch(query, page), 300) as any;
+                                   setSearchTimeout(timeout as number);
                                }}
-                               onKeyDown={(evt) => {
+                               onKeyDown={evt => {
                                    clearTimeout(searchTimeout);
-                                   let query = evt.target.value;
-                                   evt.keyCode === 13 && doSearch(query, page)
+                                   let query = (evt.target as HTMLInputElement).value;
+                                   evt.code === "enter" && doSearch(query, page)
                                }}
                                InputProps={{
                                    startAdornment: (
@@ -292,7 +291,8 @@ function SearchScreen({ws, audio}) {
                 </Toolbar>
             </Box>
             <List style={{flex: "1 1 0", overflowY: "auto"}}>
-                {(searchResult?.results || []).map((track, idx) => <Track key={idx} trackData={track} audio={audio}/>)}
+                {(searchResult?.results || []).map((track: any, idx: number) => <Track key={idx} trackData={track}
+                                                                                       audio={props.audio as any}/>)}
             </List>
             {numPages > 1 ? <Box my={2} style={{alignSelf: "center"}}>
                 <Pagination size="small"
@@ -315,27 +315,32 @@ function SearchScreen({ws, audio}) {
     )
 }
 
-function Track({trackData, audio}) {
-    let songTitle = trackData.spotify.name + " - " + trackData.spotify.artists.map(artist => artist.name).join(", ");
-    let songLink = trackData.spotify.external_urls.spotify;
-    let songImage = trackData.spotify.album.images[1]?.url;
-    let previewLink = trackData.spotify.preview_url;
+interface TrackProps {
+    trackData: any
+    audio: HTMLAudioElement
+}
+
+const Track: FC<TrackProps> = props => {
+    let songTitle = props.trackData.spotify.name + " - " + props.trackData.spotify.artists.map((artist: any) => artist.name).join(", ");
+    let songLink = props.trackData.spotify.external_urls.spotify;
+    let songImage = props.trackData.spotify.album.images[1]?.url;
+    let previewLink = props.trackData.spotify.preview_url;
     let [imageLoaded, setImageLoaded] = useState(false);
 
 
     const playAudio = () => {
         try {
-            if (audio.current.src !== previewLink) {
-                audio.current.src = previewLink; // If the audio source is empty because of a fresh render or unload, populate (or repopulate) its src attribute
+            if (props.audio.src !== previewLink) {
+                props.audio.src = previewLink; // If the audio source is empty because of a fresh render or unload, populate (or repopulate) its src attribute
             }
             if (!previewLink) return
-            audio.current.play()
+            props.audio.play()
         } catch (err) {
             console.log("Error previewing track", err)
         }
     };
-    const pauseAudio = () => audio.current.pause();
-    const openSong = () => window.open(songLink, '_blank')?.focus();
+    const pauseAudio = () => props.audio.pause();
+    const openSong = () => window.open(songLink, "_blank")?.focus();
     return (
         <Box mx={3} my={1} style={{display: "flex"}}>
             <Box onClick={openSong}
@@ -347,7 +352,7 @@ function Track({trackData, audio}) {
                     <div style={{
                         paddingBottom: "100%",
                         position: "relative",
-                        display: imageLoaded ? "none" : null
+                        display: imageLoaded ? "none" : "inline"
                     }}>
                         <div style={{
                             position: "absolute",
@@ -378,9 +383,9 @@ function Track({trackData, audio}) {
                             TransitionProps={{unmountOnExit: true}}
                             style={{flex: "1"}}>
                 <ExpansionPanelSummary expandIcon={
-                    trackData.lyrics ? (<ExpandMoreIcon/>) : null
+                    props.trackData.lyrics ? (<ExpandMoreIcon/>) : null
                 }
-                                       disabled={!trackData.lyrics}>
+                                       disabled={!props.trackData.lyrics}>
 
                     <Box ml={1}>
                         <Typography>{songTitle}</Typography>
@@ -389,7 +394,7 @@ function Track({trackData, audio}) {
                 <ExpansionPanelDetails>
                     <Box m={2}>
                         <Typography style={{whiteSpace: "break-spaces"}}>
-                            {trackData.lyrics}
+                            {props.trackData.lyrics}
                         </Typography>
                     </Box>
                 </ExpansionPanelDetails>
