@@ -110,7 +110,7 @@ const App: FC = () => {
     const wsRef = useRef<ReconnectingWebSocket>();
 
     useEffect(() => {
-        let ws = new ReconnectingWebSocket("http://127.0.0.1:3001");
+        let ws = new ReconnectingWebSocket(window.location.origin.replace(/^http/, "ws") + "/ws");
         // This custom websocket close code indicates our Spotify API token was not found or is otherwise invalid
         // In this case we will redirect back to the homepage
         ws.onclose = evt => evt.code === 4000 && removeCookie("session")
