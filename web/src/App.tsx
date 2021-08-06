@@ -107,24 +107,14 @@ const LYRICS = [
 ];
 
 const App: FC = () => {
-    const audio = useRef(new Audio(""));
     const [cookies, , removeCookie] = useCookies(["session"]);
-    const wsRef = useRef<ReconnectingWebSocket>();
-
-    useEffect(() => {
-        let ws = new ReconnectingWebSocket(window.location.origin.replace(/^http/, "ws") + "/ws");
-        // This custom websocket close code indicates our Spotify API token was not found or is otherwise invalid
-        // In this case we will redirect back to the homepage
-        ws.onclose = evt => evt.code === 4000 && removeCookie("session")
-        wsRef.current = ws;
-    }, [removeCookie]);
 
     return (
         <ThemeProvider theme={createTheme({palette: {type: "dark"}})}>
             <CssBaseline/>
             {
                 cookies.session ?
-                    <SearchScreen ws={wsRef.current} audio={audio.current}/> :
+                    <SearchScreen onWebsocketDisconnect={() => removeCookie("session")}/> :
                     <LoginScreen/>
             }
         </ThemeProvider>
@@ -207,12 +197,14 @@ const LoginScreen: FC = () => {
 }
 
 interface SearchScreenProps {
-    ws?: ReconnectingWebSocket
-    audio?: HTMLAudioElement
+    onWebsocketDisconnect: () => void;
 }
 
 const SearchScreen: FC<SearchScreenProps> = props => {
     const pageSize = 20;
+
+
+    const audio = new Audio("");
 
     const [status, setStatus] = useState<any>(null);
     const [query, setQuery] = useState("*");
@@ -224,21 +216,21 @@ const SearchScreen: FC<SearchScreenProps> = props => {
 
     // Wait until the websocket has been created and then set a listener
     useEffect(() => {
-        let interval = setInterval(() => {
-            if (!props.ws?.onmessage) return;
-            props.ws.onmessage = msg => {
-                let status = JSON.parse(msg.data);
-                if (status.complete) {
-                    // Now that we've received the last progress report, refresh the search screen
-                    if (!searchResult.length) {
-                        doSearch(query, 0).then()
-                    }
-                }
-                setStatus(status);
-            };
-            clearInterval(interval)
-        }, 100)
-    });
+        let ws = new ReconnectingWebSocket(WS_URL);
+        // This custom websocket close code indicates our Spotify API token was not found or is otherwise invalid
+        // In this case we will redirect back to the homepage
+        ws.onclose = evt => evt.code === 4000 && props.onWebsocketDisconnect()
+        ws.onmessage = msg => {
+            let status = JSON.parse(msg.data);
+            // if (status.complete) {
+            //     // Now that we've received the last progress report, refresh the search screen
+            //     if (!searchResult.length) {
+            //         doSearch(query, 0).catch(console.error)
+            //     }
+            // }
+            setStatus(status);
+        }
+    }, [props]);
 
     const doSearch = async (thisQuery: string, page: number) => {
         console.log(`Performing search with q=${thisQuery}, offset=${page * pageSize}, limit=${pageSize}`);
@@ -295,7 +287,7 @@ const SearchScreen: FC<SearchScreenProps> = props => {
             </Box>
             <List style={{flex: "1 1 0", overflowY: "auto"}}>
                 {(searchResult?.results || []).map((track: any, idx: number) => <Track key={idx} trackData={track}
-                                                                                       audio={props.audio as any}/>)}
+                                                                                       audio={audio}/>)}
             </List>
             {numPages > 1 ? <Box my={2} style={{alignSelf: "center"}}>
                 <Pagination size="small"
