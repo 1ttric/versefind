@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"flag"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"versefind/pkg"
@@ -10,9 +9,8 @@ import (
 func init() {
 	rootCmd.PersistentFlags().StringVar(&verbosity, "verbosity", "debug", "a logrus logging level name")
 	rootCmd.PersistentFlags().StringVar(&listenAddr, "listen", "0.0.0.0:3001", "the address and port on which to listen")
-	rootCmd.PersistentFlags().StringVar(&oauthRedirectAddr, "oauthredirectaddr", "https://versefind.vesey.tech/callback", "the oauth redirect endpoint")
+	rootCmd.PersistentFlags().StringVar(&oauthRedirectAddr, "oauthredirectaddr", "https://versefind.vesey.tech/api/callback", "the oauth redirect endpoint")
 	rootCmd.PersistentFlags().StringVar(&esAddr, "elastic", "http://127.0.0.1:9200", "the Elastic instance in which to cache track data and lyric content")
-	flag.Parse()
 }
 
 var (
