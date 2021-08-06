@@ -25,6 +25,8 @@ import Fade from "@material-ui/core/Fade";
 import IconButton from "@material-ui/core/IconButton";
 import ReconnectingWebSocket from "reconnecting-websocket";
 
+const API_URL = (process.env.REACT_APP_API_URL ?? window.location.origin) + "/api"
+const WS_URL = (process.env.REACT_APP_API_URL ?? window.location.origin).replace(/^http/, "ws") + "/ws"
 
 const LYRICS = [
     {
@@ -196,7 +198,7 @@ const LoginScreen: FC = () => {
             </Fade>
             <div style={{flex: "4"}}>
                 <Box mt={3}>
-                    <Button href="/auth">Search</Button>
+                    <Button href={`${API_URL}/auth`}>Search</Button>
                 </Box>
             </div>
         </Box>
@@ -244,7 +246,7 @@ const SearchScreen: FC<SearchScreenProps> = props => {
         setQuery(thisQuery);
         let resp;
         try {
-            resp = await axios.get("/search", {params: {q: thisQuery, offset: page * pageSize, limit: pageSize}});
+            resp = await axios.get(`${API_URL}/search`, {params: {q: thisQuery, offset: page * pageSize, limit: pageSize}});
         } catch (err) {
             console.log("Search failed - defaulting");
             setSearchResult(null);

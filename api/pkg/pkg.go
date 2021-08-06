@@ -562,7 +562,6 @@ func IndexLyrics(track spotify.FullTrack) error {
 }
 
 func ScrapeGenius(query string) (string, bool, error) {
-
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
 	params := url.Values{}
 	params.Set("q", query)
@@ -707,9 +706,9 @@ func Serve(listenAddr, oauthRedirectAddr, esAddr string) {
 	spotifyAuth = spotify.NewAuthenticator(oauthRedirectAddr, spotify.ScopeUserLibraryRead)
 	spotifyAuth.SetAuthInfo(oauthClientID, oauthSecret)
 
-	http.HandleFunc("/auth", authHandler)
-	http.HandleFunc("/callback", callbackHandler)
+	http.HandleFunc("/api/auth", authHandler)
+	http.HandleFunc("/api/callback", callbackHandler)
 	http.HandleFunc("/ws", wsHandler)
-	http.HandleFunc("/search", searchHandler)
+	http.HandleFunc("/api/search", searchHandler)
 	_ = http.ListenAndServe(listenAddr, nil)
 }
