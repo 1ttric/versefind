@@ -40,7 +40,7 @@ spec:
       volumes:
       - name: appdata
         nfs:
-          server: nas
+          server: nas.vtec
           path: /mnt/tank/data/containers/versefind
       imagePullSecrets:
       - name: gitlab-registry
